@@ -23,13 +23,17 @@ function derivedActivePlayer(gametTurns) {
 }
 
 function App() {
+  const [players, setPlayers] = useState({
+    'X': 'Player1',
+    'O': 'Player2',
+  });
   const [gametTurns, setGameTurns] = useState([])
   // const [hasWinner , setHasWinner] = useState(false);
   // const [activePlayer, setActivePlayer] = useState('X');
 
   const activePlayer = derivedActivePlayer(gametTurns);
 
-  let gameBoard = initialGameBoard.map(row => [...row]);
+  let gameBoard = [...initialGameBoard.map(row => [...row])];
 
   for (const turn of gametTurns) {
     const { square, player } = turn;
@@ -50,7 +54,7 @@ function App() {
       firstSquaresSymbol === secondSquaresSymbol &&
       firstSquaresSymbol === thirdSquaresSymbol
     ) {
-      winner = firstSquaresSymbol;
+      winner = players[firstSquaresSymbol];
     }
 
   }
@@ -70,6 +74,19 @@ function App() {
     });
   }
 
+  function handleRestart() {
+    setGameTurns([]);
+  }
+
+  function handlePlayerNameChange(symbol, newName) {
+    setPlayers(prevPlayer => {
+      return {
+        ...prevPlayer,
+        [symbol]: newName
+      }
+    });
+  }
+
   return (
     <main>
       <div id="game-container">
@@ -77,13 +94,17 @@ function App() {
           <Player
             initialName="Player 1"
             symbol="X"
-            isActive={activePlayer === 'X'} />
+            isActive={activePlayer === 'X'}
+            onChangeName={handlePlayerNameChange}
+          />
           <Player
             initialName="Player 2"
             symbol="O"
-            isActive={activePlayer === 'O'} />
+            isActive={activePlayer === 'O'}
+            onChangeName={handlePlayerNameChange}
+          />
         </ol>
-        {(winner || hasDraw) && < GameOver winner={winner} />}
+        {(winner || hasDraw) && < GameOver winner={winner} onRestart={handleRestart} />}
         <GameBoard
           onSelectSquare={handleSelectSquare}
           board={gameBoard} />
